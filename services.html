@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services - Kishan Mitra</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: url('https://images.unsplash.com/photo-1606112219348-204d7d8b94ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(34, 139, 34, 0.85);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px auto;
+      max-width: 900px;
+      width: 90%;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+      color: #228B22;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .btn {
+      background: #228B22;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #1a661a;
+    }
+
+    .form-section, .view-section {
+      display: none;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .dynamic-field {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .record-card {
+      background: #f5f5f5;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    .record-card h3 {
+      margin: 0 0 10px;
+      color: #228B22;
+    }
+
+    .record-actions {
+      margin-top: 10px;
+    }
+
+    .record-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-right: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .edit-btn {
+      background: #ffa500;
+      color: white;
+    }
+
+    .edit-btn:hover {
+      background: #e68a00;
+    }
+
+    .delete-btn {
+      background: #ff4d4d;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background: #cc0000;
+    }
+
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 15px;
+      background: rgba(34, 139, 34, 0.85);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <header>Services - Kishan Mitra 🌱</header>
+
+  <div class="container">
+    <h2>Select an Option</h2>
+    <button class="btn" onclick="showForm()">➕ Add Field Details</button>
+    <button class="btn" onclick="showRecords()">📑 View Added Details</button>
+
+    <!-- ADD FIELD FORM -->
+    <div class="form-section" id="formSection">
+      <h2 id="formTitle">Add Field Details</h2>
+      <label for="khataNo">Khata No:</label>
+      <input type="text" id="khataNo">
+
+      <label for="khesraNo">Khesra No:</label>
+      <input type="text" id="khesraNo">
+
+      <label for="rakwa">Rakwa:</label>
+      <input type="text" id="rakwa">
+
+      <label for="name">Name:</label>
+      <input type="text" id="name">
+
+      <div id="dynamicFields"></div>
+
+      <button class="btn" onclick="addDynamicField()">➕ Add Custom Field</button>
+      <button class="btn" onclick="saveRecord()">💾 Save Record</button>
+    </div>
+
+    <!-- VIEW ADDED DETAILS -->
+    <div class="view-section" id="viewSection">
+      <h2>All Added Details</h2>
+      <div id="recordsList"></div>
+    </div>
+  </div>
+
+  <footer>&copy; 2025 Kishan Mitra | Growing Together 🌾</footer>
+
+  <script>
+    let editIndex = null;
+
+    function showForm() {
+      document.getElementById("formSection").style.display = "block";
+      document.getElementById("viewSection").style.display = "none";
+      if (editIndex === null) resetForm();
+    }
+
+    function showRecords() {
+      document.getElementById("formSection").style.display = "none";
+      document.getElementById("viewSection").style.display = "block";
+      loadRecords();
+    }
+
+    function addDynamicField(name = "", value = "") {
+      const container = document.getElementById("dynamicFields");
+      const div = document.createElement("div");
+      div.className = "dynamic-field";
+      div.innerHTML = `
+        <input type="text" placeholder="Field Name" value="${name}">
+        <input type="text" placeholder="Value" value="${value}">
+      `;
+      container.appendChild(div);
+    }
+
+    function saveRecord() {
+      const khataNo = document.getElementById("khataNo").value.trim();
+      const khesraNo = document.getElementById("khesraNo").value.trim();
+      const rakwa = document.getElementById("rakwa").value.trim();
+      const name = document.getElementById("name").value.trim();
+
+      if (!khataNo || !khesraNo) {
+        alert("Please fill Khata and Khesra No!");
+        return;
+      }
+
+      let dynamicFields = [];
+      document.querySelectorAll("#dynamicFields .dynamic-field").forEach(field => {
+        const inputs = field.querySelectorAll("input");
+        if (inputs[0].value && inputs[1].value) {
+          dynamicFields.push({ name: inputs[0].value, value: inputs[1].value });
+        }
+      });
+
+      let records = JSON.parse(localStorage.getItem("fieldRecords")) || [];
+
+      if (editIndex !== null) {
+        records[editIndex] = { khataNo, khesraNo, rakwa, name, dynamicFields };
+        editIndex = null;
+        document.getElementById("formTitle").innerText = "Add Field Details";
+      } else {
+        records.push({ khataNo, khesraNo, rakwa, name, dynamicFields });
+      }
+
+      localStorage.setItem("fieldRecords", JSON.stringify(records));
+
+      alert("Record Saved Successfully ✅");
+      resetForm();
+    }
+
+    function resetForm() {
+      document.getElementById("khataNo").value = "";
+      document.getElementById("khesraNo").value = "";
+      document.getElementById("rakwa").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("dynamicFields").innerHTML = "";
+    }
+
+    function loadRecords() {
+      let records = JSON.parse(localStorage.getItem("fieldRecords")) || [];
+      let container = document.getElementById("recordsList");
+      container.innerHTML = "";
+
+      if (records.length === 0) {
+        container.innerHTML = "<p>No records added yet.</p>";
+        return;
+      }
+
+      records.forEach((rec, index) => {
+        let div = document.createElement("div");
+        div.className = "record-card";
+        div.innerHTML = `<h3>Record ${index + 1}</h3>
+          <p><b>Khata No:</b> ${rec.khataNo}</p>
+          <p><b>Khesra No:</b> ${rec.khesraNo}</p>
+          <p><b>Rakwa:</b> ${rec.rakwa}</p>
+          <p><b>Name:</b> ${rec.name}</p>
+          ${rec.dynamicFields.map(f => `<p><b>${f.name}:</b> ${f.value}</p>`).join("")}
+          <div class="record-actions">
+            <button class="record-btn edit-btn" onclick="editRecord(${index})">✏️ Edit</button>
+            <button class="record-btn delete-btn" onclick="deleteRecord(${index})">❌ Delete</button>
+          </div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function editRecord(index) {
+      let records = JSON.parse(localStorage.getItem("fieldRecords")) || [];
+      let rec = records[index];
+      editIndex = index;
+
+      document.getElementById("formTitle").innerText = "Edit Field Details";
+      document.getElementById("khataNo").value = rec.khataNo;
+      document.getElementById("khesraNo").value = rec.khesraNo;
+      document.getElementById("rakwa").value = rec.rakwa;
+      document.getElementById("name").value = rec.name;
+      document.getElementById("dynamicFields").innerHTML = "";
+      rec.dynamicFields.forEach(f => addDynamicField(f.name, f.value));
+
+      document.getElementById("formSection").style.display = "block";
+      document.getElementById("viewSection").style.display = "none";
+    }
+
+    function deleteRecord(index) {
+      if (confirm("Are you sure you want to delete this record?")) {
+        let records = JSON.parse(localStorage.getItem("fieldRecords")) || [];
+        records.splice(index, 1);
+        localStorage.setItem("fieldRecords", JSON.stringify(records));
+        loadRecords();
+      }
+    }
+  </script>
+</body>
+</html>
